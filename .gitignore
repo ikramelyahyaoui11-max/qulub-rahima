@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# runtime data store (admin-edited content) — seeded fresh on first boot,
+# must live on a persistent volume in production, not in git
+/data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

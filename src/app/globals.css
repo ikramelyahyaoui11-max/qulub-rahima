@@ -1,26 +1,139 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8f4;
+  --foreground: #16241c;
+
+  --brand-green-950: #0b1f16;
+  --brand-green-900: #12301f;
+  --brand-green-800: #1a4128;
+  --brand-green-700: #235536;
+  --brand-green-600: #2f6d46;
+  --brand-gold-600: #a97b2e;
+  --brand-gold-500: #c2953f;
+  --brand-gold-400: #d6ac5c;
+  --brand-cream-100: #faf8f4;
+  --brand-cream-200: #efe7d6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-cairo);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-green-950: var(--brand-green-950);
+  --color-brand-green-900: var(--brand-green-900);
+  --color-brand-green-800: var(--brand-green-800);
+  --color-brand-green-700: var(--brand-green-700);
+  --color-brand-green-600: var(--brand-green-600);
+  --color-brand-gold-600: var(--brand-gold-600);
+  --color-brand-gold-500: var(--brand-gold-500);
+  --color-brand-gold-400: var(--brand-gold-400);
+  --color-brand-cream-100: var(--brand-cream-100);
+  --color-brand-cream-200: var(--brand-cream-200);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Editorial section kicker (replaces the old pill badge) */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--brand-gold-600);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: var(--brand-gold-600);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(11, 31, 22, 0.08), 0 12px 22px -12px rgba(11, 31, 22, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.94);
+  box-shadow: 0 1px 2px rgba(11, 31, 22, 0.08), 0 16px 28px -12px rgba(11, 31, 22, 0.5);
+}
+.btn-primary:active {
+  transform: translateY(0);
+  filter: brightness(0.9);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1.5px solid var(--brand-green-700);
+  color: var(--brand-green-800);
+  font-weight: 600;
+  background: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.btn-outline:hover {
+  background: var(--brand-green-700);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Elevated card */
+.card-elevate {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-elevate:hover {
+  transform: translateY(-3px);
+  border-color: rgba(11, 31, 22, 0.12);
+  box-shadow: 0 18px 34px -18px rgba(11, 31, 22, 0.32);
+}
+
+/* Soft brand shadow */
+.shadow-brand {
+  box-shadow: 0 20px 45px -20px rgba(11, 31, 22, 0.45);
+}
+
+/* Subtle geometric motif (nods to Arabic/African textile patterns) */
+.pattern-motif {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.5) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+.pattern-motif-dark {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(194, 149, 63, 0.3) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-10px) translateX(5px); }
+}
+.animate-float-slow {
+  animation: float-slow 9s ease-in-out infinite;
+}
+
+/* Continuous auto-scrolling single-line carousel */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee-x 50s linear infinite;
+}
+.animate-marquee:hover,
+.animate-marquee:focus-within {
+  animation-play-state: paused;
 }
