@@ -131,7 +131,7 @@ body {
   to { transform: translateX(-50%); }
 }
 .animate-marquee {
-  animation: marquee-x 50s linear infinite;
+  animation: marquee-x 100s linear infinite;
 }
 .animate-marquee:hover,
 .animate-marquee:focus-within {
