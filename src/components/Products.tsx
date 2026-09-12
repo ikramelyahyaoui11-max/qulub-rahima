@@ -42,7 +42,12 @@ function ProductCard({ product }: { product: Product }) {
       href={`/product/${product.id}`}
       className="card-elevate group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white text-right shadow-[0_2px_10px_-4px_rgba(11,31,22,0.12)]"
     >
-      <div className="relative h-56 overflow-hidden bg-brand-cream-100">
+      <div className="h-1 w-full bg-gradient-to-l from-brand-gold-400 via-brand-gold-500 to-brand-gold-600" />
+      <div
+        className={`relative overflow-hidden ${
+          product.hasPosterPhoto ? "aspect-square bg-brand-cream-100 p-4" : "h-56 bg-brand-cream-100"
+        }`}
+      >
         <Image
           src={product.photo}
           alt={product.name}
