@@ -3,6 +3,7 @@ import { Cairo } from "next/font/google";
 import { CartProvider } from "@/lib/cart";
 import { CurrencyProvider } from "@/lib/currency";
 import CartDrawer from "@/components/CartDrawer";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <CartProvider>
             {children}
             <CartDrawer />
+            <ScrollToTopButton />
           </CartProvider>
         </CurrencyProvider>
       </body>
