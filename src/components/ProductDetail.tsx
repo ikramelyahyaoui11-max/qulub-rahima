@@ -179,7 +179,11 @@ export default function ProductDetail({ product }: { product: Product }) {
         </div>
 
         <div className="order-1 lg:order-2">
-          <div className="shadow-brand relative mx-auto h-80 max-w-md overflow-hidden rounded-[2rem] bg-white ring-4 ring-white sm:h-96">
+          <div
+            className={`shadow-brand relative mx-auto max-w-md overflow-hidden rounded-[2rem] bg-white ring-4 ring-white ${
+              product.hasPosterPhoto ? "aspect-square p-3 sm:p-5" : "h-80 sm:h-96"
+            }`}
+          >
             <Image
               src={product.photo}
               alt={product.name}
