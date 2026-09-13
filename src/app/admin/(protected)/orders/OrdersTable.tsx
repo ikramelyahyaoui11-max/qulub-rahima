@@ -158,7 +158,7 @@ export default function OrdersTable({ orders }: { orders: Order[] }) {
                       dir="ltr"
                       className="rounded-full bg-brand-gold-500/10 px-2.5 py-1 text-xs font-extrabold text-brand-gold-600"
                     >
-                      {order.orderNumber ? `#${order.orderNumber}` : "—"}
+                      {order.orderNumber || "—"}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-xs text-brand-green-900/60">

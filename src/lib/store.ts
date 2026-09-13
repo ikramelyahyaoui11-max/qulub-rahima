@@ -12,6 +12,8 @@ const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
 const OTHER_PROJECTS_FILE = path.join(DATA_DIR, "other-projects.json");
 const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
 const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
+const ORDER_COUNTER_FILE = path.join(DATA_DIR, "order-counter.json");
+const STARTING_ORDER_NUMBER = 1800;
 
 export type OrderItem = {
   name: string;
@@ -109,4 +111,14 @@ export async function setOrderContacted(id: string, contacted: boolean): Promise
 /** Generates a short, unique, URL-safe id for a new item (Arabic names can't be reliably slugified). */
 export function generateId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/** Reserves and returns the next sequential order number (T1800, T1801, ...). */
+export async function reserveNextOrderNumber(): Promise<string> {
+  const counter = await readJSON<{ last: number }>(ORDER_COUNTER_FILE, {
+    last: STARTING_ORDER_NUMBER - 1,
+  });
+  const next = counter.last + 1;
+  await writeJSON(ORDER_COUNTER_FILE, { last: next });
+  return `T${next}`;
 }

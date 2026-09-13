@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, MessageCircle, ShoppingBasket } from "lucide-react";
 import { useCart } from "@/lib/cart";
@@ -35,14 +35,15 @@ export default function BookingForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [orderNumber] = useState(() => String(Date.now() % 1000000).padStart(6, "0"));
+  const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = items.length > 0 && name.trim().length > 1 && phone.trim().length >= 8;
 
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-    submitOrderAction({
-      orderNumber,
+  const handleSend = async () => {
+    if (!canSubmit || submitting) return;
+    setSubmitting(true);
+
+    const orderInput = {
       name: name.trim(),
       phone: phone.trim(),
       whatsappNumber: whatsappNumber.trim() || undefined,
@@ -58,23 +59,30 @@ export default function BookingForm() {
       totalDisplay: total.amount,
       currencyCode: currency.code,
       currencySymbol: currency.symbol,
-    }).catch(() => {
-      // best-effort save; don't block handing the customer off to WhatsApp
-    });
-  };
+    };
 
-  const whatsappHref = useMemo(() => {
-    const lines = [
-      `رقم الطلب: #${orderNumber}`,
-      `الاسم: ${name.trim()}`,
-      `رقم الهاتف: ${phone.trim()}`,
-    ];
+    let orderNumber: string | null = null;
+    try {
+      const result = await submitOrderAction(orderInput);
+      orderNumber = result.orderNumber;
+    } catch {
+      // best-effort save; still hand the customer off to WhatsApp without a number
+    }
+
+    const lines: string[] = [];
+    if (orderNumber) lines.push(`رقم الطلب: ${orderNumber}`);
+    lines.push(`الاسم: ${name.trim()}`, `رقم الهاتف: ${phone.trim()}`);
     if (whatsappNumber.trim()) lines.push(`رقم واتساب: ${whatsappNumber.trim()}`);
     lines.push("", "ملخص الطلب:");
     items.forEach((item, i) => lines.push(`${i + 1}) ${itemLine(item, format)}`));
     lines.push("", `الإجمالي: ${total.amount} ${total.symbol}`);
-    return `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
-  }, [orderNumber, name, phone, whatsappNumber, items, format, total]);
+    const url = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
+
+    const win = window.open(url, "_blank", "noopener,noreferrer");
+    if (!win) window.location.href = url;
+
+    setSubmitting(false);
+  };
 
   if (items.length === 0) {
     return (
@@ -148,13 +156,6 @@ export default function BookingForm() {
           />
         </label>
 
-        <div className="flex items-center justify-between rounded-lg bg-brand-gold-500/10 px-3 py-2 text-sm">
-          <span className="font-bold text-brand-green-900">رقم الطلب</span>
-          <span dir="ltr" className="font-extrabold text-brand-gold-600">
-            #{orderNumber}
-          </span>
-        </div>
-
         <div className="flex flex-col gap-1.5 text-sm">
           <span className="font-bold text-brand-green-900">ملخص الطلب</span>
           <div className="flex flex-col divide-y divide-black/5 rounded-lg bg-brand-cream-100 p-3">
@@ -215,25 +216,17 @@ export default function BookingForm() {
           <span>الإجمالي:</span>
         </div>
 
-        <a
-          href={canSubmit ? whatsappHref : undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-disabled={!canSubmit}
-          onClick={(e) => {
-            if (!canSubmit) {
-              e.preventDefault();
-              return;
-            }
-            handleSubmit();
-          }}
+        <button
+          type="button"
+          disabled={!canSubmit || submitting}
+          onClick={handleSend}
           className={`btn-primary py-3 text-sm ${
-            canSubmit ? "" : "cursor-not-allowed opacity-50"
+            canSubmit && !submitting ? "" : "cursor-not-allowed opacity-50"
           }`}
         >
           <MessageCircle className="h-4 w-4" />
-          إرسال الطلب عبر واتساب
-        </a>
+          {submitting ? "جارٍ التجهيز..." : "إرسال الطلب عبر واتساب"}
+        </button>
         {!canSubmit && (
           <p className="-mt-3 text-center text-xs text-brand-green-900/50">
             يرجى كتابة الاسم ورقم هاتف صحيح لإرسال الطلب
