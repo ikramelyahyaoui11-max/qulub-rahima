@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 
-export type CurrencyCode = "EGP" | "USD" | "SAR";
+export type CurrencyCode = "EGP" | "USD" | "SAR" | "EUR";
 
 export type Currency = {
   code: CurrencyCode;
@@ -23,6 +23,7 @@ export const CURRENCIES: Currency[] = [
   { code: "EGP", label: "جنيه مصري", symbol: "ج.م", egpPerUnit: 1 },
   { code: "USD", label: "دولار", symbol: "$", egpPerUnit: 49 },
   { code: "SAR", label: "ريال سعودي", symbol: "ر.س", egpPerUnit: 13.05 },
+  { code: "EUR", label: "يورو", symbol: "€", egpPerUnit: 53 },
 ];
 
 type CurrencyContextValue = {
@@ -41,6 +42,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     EGP: 1,
     USD: CURRENCIES.find((c) => c.code === "USD")!.egpPerUnit,
     SAR: CURRENCIES.find((c) => c.code === "SAR")!.egpPerUnit,
+    EUR: CURRENCIES.find((c) => c.code === "EUR")!.egpPerUnit,
   });
 
   useEffect(() => {
@@ -55,12 +57,13 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetch("/api/settings", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
-      .then((settings: { usdRate?: number; sarRate?: number } | null) => {
+      .then((settings: { usdRate?: number; sarRate?: number; eurRate?: number } | null) => {
         if (!settings) return;
         setRates((prev) => ({
           ...prev,
           USD: typeof settings.usdRate === "number" ? settings.usdRate : prev.USD,
           SAR: typeof settings.sarRate === "number" ? settings.sarRate : prev.SAR,
+          EUR: typeof settings.eurRate === "number" ? settings.eurRate : prev.EUR,
         }));
       })
       .catch(() => {

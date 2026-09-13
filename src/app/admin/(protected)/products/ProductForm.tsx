@@ -33,7 +33,7 @@ function PriceTierFields({
   return (
     <fieldset className="rounded-xl border border-black/10 p-3 sm:col-span-2">
       <legend className="px-1 text-sm font-bold text-brand-green-900">{legend}</legend>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <label className="flex flex-col gap-1 text-xs">
           <span className="font-semibold text-brand-green-900/80">السعر (ج.م)</span>
           <input
@@ -54,6 +54,18 @@ function PriceTierFields({
             min={0}
             step="1"
             defaultValue={defaultValue?.usd}
+            required
+            className={fieldClass}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          <span className="font-semibold text-brand-green-900/80">السعر باليورو (€)</span>
+          <input
+            type="number"
+            name={`priceEur${suffix}`}
+            min={0}
+            step="1"
+            defaultValue={defaultValue?.eur}
             required
             className={fieldClass}
           />

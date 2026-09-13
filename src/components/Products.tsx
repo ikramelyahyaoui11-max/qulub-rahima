@@ -4,14 +4,14 @@ import { useState, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Check, Minus, Plus, ShoppingBasket, Users } from "lucide-react";
-import { ADDON_OPTIONS, getProductPrice, type Product } from "@/lib/data";
+import { ADDON_OPTIONS, getProductPrice, type CurrencyKey, type Product } from "@/lib/data";
 import { useCart } from "@/lib/cart";
 import { useCurrency } from "@/lib/currency";
 
 function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
   const { currency } = useCurrency();
-  const price = getProductPrice(product, ADDON_OPTIONS[0], currency.code.toLowerCase() as "egp" | "usd" | "sar");
+  const price = getProductPrice(product, ADDON_OPTIONS[0], currency.code.toLowerCase() as CurrencyKey);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 

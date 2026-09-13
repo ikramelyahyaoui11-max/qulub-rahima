@@ -26,12 +26,14 @@ export const HERO_CATEGORIES = [
   "العقيقة",
 ];
 
-export type CurrencyKey = "egp" | "usd" | "sar";
+export type CurrencyKey = "egp" | "usd" | "sar" | "eur";
 
 export type ProductPrice = {
   egp: number;
   usd: number;
   sar: number;
+  /** Optional so existing saved products (from before EUR support) don't break; falls back to an estimate from USD. */
+  eur?: number;
 };
 
 /** Manually-set prices per addon tier — no automatic currency conversion, matching how the admin enters them. */
@@ -67,7 +69,11 @@ export function getProductPrice(
       : addon === ADDON_OPTIONS[2]
         ? product.pricing.rice10kg
         : product.pricing.base;
-  return tier[currencyKey];
+  if (currencyKey === "eur" && tier.eur === undefined) {
+    // Estimate from USD for products saved before EUR pricing existed.
+    return Math.round(tier.usd * 0.93);
+  }
+  return tier[currencyKey] ?? 0;
 }
 
 /** Seed data — used to bootstrap data/products.json on first run. After that, the JSON file (editable from /admin) is the source of truth. */
@@ -82,9 +88,9 @@ export const PRODUCTS: Product[] = [
     rating: 5,
     defaultIntention: "عقيقة",
     pricing: {
-      base: { egp: 1900, usd: 40, sar: 150 },
-      rice5kg: { egp: 2250, usd: 50, sar: 190 },
-      rice10kg: { egp: 2600, usd: 60, sar: 230 },
+      base: { egp: 1900, usd: 40, sar: 150, eur: 37 },
+      rice5kg: { egp: 2250, usd: 50, sar: 190, eur: 46 },
+      rice10kg: { egp: 2600, usd: 60, sar: 230, eur: 56 },
     },
     photo: "/products/goat.jpg",
     hasPosterPhoto: true,
@@ -99,9 +105,9 @@ export const PRODUCTS: Product[] = [
     rating: 5,
     defaultIntention: "عقيقة",
     pricing: {
-      base: { egp: 2500, usd: 60, sar: 240 },
-      rice5kg: { egp: 2850, usd: 70, sar: 280 },
-      rice10kg: { egp: 3200, usd: 80, sar: 320 },
+      base: { egp: 2500, usd: 60, sar: 240, eur: 56 },
+      rice5kg: { egp: 2850, usd: 70, sar: 280, eur: 65 },
+      rice10kg: { egp: 3200, usd: 80, sar: 320, eur: 74 },
     },
     photo: "/products/sheep.jpg",
     hasPosterPhoto: true,
@@ -116,9 +122,9 @@ export const PRODUCTS: Product[] = [
     rating: 5,
     defaultIntention: "أضحية",
     pricing: {
-      base: { egp: 4200, usd: 85, sar: 320 },
-      rice5kg: { egp: 4550, usd: 95, sar: 360 },
-      rice10kg: { egp: 4900, usd: 105, sar: 400 },
+      base: { egp: 4200, usd: 85, sar: 320, eur: 79 },
+      rice5kg: { egp: 4550, usd: 95, sar: 360, eur: 88 },
+      rice10kg: { egp: 4900, usd: 105, sar: 400, eur: 98 },
     },
     photo: "/products/ram.jpg",
     hasPosterPhoto: true,
@@ -133,9 +139,9 @@ export const PRODUCTS: Product[] = [
     rating: 5,
     defaultIntention: "أضحية",
     pricing: {
-      base: { egp: 10000, usd: 200, sar: 750 },
-      rice5kg: { egp: 10350, usd: 210, sar: 790 },
-      rice10kg: { egp: 10700, usd: 220, sar: 830 },
+      base: { egp: 10000, usd: 200, sar: 750, eur: 186 },
+      rice5kg: { egp: 10350, usd: 210, sar: 790, eur: 195 },
+      rice10kg: { egp: 10700, usd: 220, sar: 830, eur: 205 },
     },
     photo: "/products/calf.jpg",
     hasPosterPhoto: true,
@@ -150,9 +156,9 @@ export const PRODUCTS: Product[] = [
     rating: 5,
     defaultIntention: "أضحية",
     pricing: {
-      base: { egp: 13000, usd: 265, sar: 1000 },
-      rice5kg: { egp: 13350, usd: 275, sar: 1040 },
-      rice10kg: { egp: 13700, usd: 285, sar: 1080 },
+      base: { egp: 13000, usd: 265, sar: 1000, eur: 246 },
+      rice5kg: { egp: 13350, usd: 275, sar: 1040, eur: 256 },
+      rice10kg: { egp: 13700, usd: 285, sar: 1080, eur: 265 },
     },
     photo: "/products/cow.jpg",
     hasPosterPhoto: true,

@@ -66,9 +66,9 @@ export async function saveProductAction(_prevState: ActionState, formData: FormD
   }
 
   const priceFields = {
-    base: { egp: "priceEgp", usd: "priceUsd", sar: "priceSar" },
-    rice5kg: { egp: "priceEgp5", usd: "priceUsd5", sar: "priceSar5" },
-    rice10kg: { egp: "priceEgp10", usd: "priceUsd10", sar: "priceSar10" },
+    base: { egp: "priceEgp", usd: "priceUsd", sar: "priceSar", eur: "priceEur" },
+    rice5kg: { egp: "priceEgp5", usd: "priceUsd5", sar: "priceSar5", eur: "priceEur5" },
+    rice10kg: { egp: "priceEgp10", usd: "priceUsd10", sar: "priceSar10", eur: "priceEur10" },
   } as const;
 
   const pricing: Record<string, ProductPrice> = {};
@@ -76,10 +76,11 @@ export async function saveProductAction(_prevState: ActionState, formData: FormD
     const egp = parsePrice(formData, fields.egp);
     const usd = parsePrice(formData, fields.usd);
     const sar = parsePrice(formData, fields.sar);
-    if (egp === null || usd === null || sar === null) {
-      return { error: "برجاء إدخال جميع الأسعار بشكل صحيح (ج.م، $، ر.س) لكل مستوى" };
+    const eur = parsePrice(formData, fields.eur);
+    if (egp === null || usd === null || sar === null || eur === null) {
+      return { error: "برجاء إدخال جميع الأسعار بشكل صحيح (ج.م، $، ر.س، €) لكل مستوى" };
     }
-    pricing[tier] = { egp, usd, sar };
+    pricing[tier] = { egp, usd, sar, eur };
   }
 
   const products = await getProducts();
@@ -207,12 +208,17 @@ export async function saveSettingsAction(
 
   const usdRate = Number(formData.get("usdRate"));
   const sarRate = Number(formData.get("sarRate"));
+  const eurRate = Number(formData.get("eurRate"));
 
-  if (!Number.isFinite(usdRate) || usdRate <= 0 || !Number.isFinite(sarRate) || sarRate <= 0) {
+  if (
+    !Number.isFinite(usdRate) || usdRate <= 0 ||
+    !Number.isFinite(sarRate) || sarRate <= 0 ||
+    !Number.isFinite(eurRate) || eurRate <= 0
+  ) {
     return { error: "القيم غير صالحة" };
   }
 
-  await saveSettings({ usdRate, sarRate });
+  await saveSettings({ usdRate, sarRate, eurRate });
   revalidatePath("/", "layout");
 
   return { success: "تم حفظ أسعار الصرف" };

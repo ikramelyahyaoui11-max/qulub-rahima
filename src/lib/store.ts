@@ -42,9 +42,10 @@ export type Order = {
 export type Settings = {
   usdRate: number;
   sarRate: number;
+  eurRate: number;
 };
 
-const DEFAULT_SETTINGS: Settings = { usdRate: 49, sarRate: 13.05 };
+const DEFAULT_SETTINGS: Settings = { usdRate: 49, sarRate: 13.05, eurRate: 53 };
 
 async function readJSON<T>(file: string, seed: T): Promise<T> {
   try {

@@ -47,9 +47,22 @@ export default function CurrencyForm({ settings }: { settings: Settings }) {
         />
       </label>
 
+      <label className="flex flex-col gap-1.5 text-sm">
+        <span className="font-bold text-brand-green-900">كم جنيهًا مصريًا يساوي 1 يورو (€)</span>
+        <input
+          type="number"
+          name="eurRate"
+          min={0.01}
+          step="0.01"
+          defaultValue={settings.eurRate}
+          required
+          className="rounded-lg border border-black/10 bg-brand-cream-100 px-3 py-2 text-brand-green-900 outline-none focus:border-brand-gold-500 focus:ring-2 focus:ring-brand-gold-500/20"
+        />
+      </label>
+
       <p className="text-xs text-brand-green-900/50">
         هذه الأسعار تُستخدم فقط لتحويل أسعار «أبواب القلوب الرحيمة الأخرى» (الآبار، البطانيات...) عند اختيار
-        الزائر للدولار أو الريال السعودي. أما أسعار المنتجات (بقرة، عجل، ماعز...) فتُدخل يدويًا لكل عملة من
+        الزائر للدولار أو اليورو أو الريال السعودي. أما أسعار المنتجات (بقرة، عجل، ماعز...) فتُدخل يدويًا لكل عملة من
         صفحة «المنتجات».
       </p>
 

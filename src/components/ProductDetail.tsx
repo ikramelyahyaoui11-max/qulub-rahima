@@ -10,6 +10,7 @@ import {
   DELIVERY_NOTE,
   INTENTIONS,
   getProductPrice,
+  type CurrencyKey,
   type Product,
 } from "@/lib/data";
 import { useCart } from "@/lib/cart";
@@ -25,7 +26,7 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const price = getProductPrice(product, addon, currency.code.toLowerCase() as "egp" | "usd" | "sar");
+  const price = getProductPrice(product, addon, currency.code.toLowerCase() as CurrencyKey);
 
   const buildCartItem = () => {
     const name = dedicationName.trim();

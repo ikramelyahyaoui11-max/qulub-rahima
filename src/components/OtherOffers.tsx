@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ADDON_OPTIONS, getProductPrice, type Product } from "@/lib/data";
+import { ADDON_OPTIONS, getProductPrice, type CurrencyKey, type Product } from "@/lib/data";
 import { useCurrency } from "@/lib/currency";
 
 function OfferCard({ product }: { product: Product }) {
   const { currency } = useCurrency();
-  const price = getProductPrice(product, ADDON_OPTIONS[0], currency.code.toLowerCase() as "egp" | "usd" | "sar");
+  const price = getProductPrice(product, ADDON_OPTIONS[0], currency.code.toLowerCase() as CurrencyKey);
   const photo = product.photo;
 
   return (
