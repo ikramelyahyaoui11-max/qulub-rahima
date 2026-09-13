@@ -251,10 +251,10 @@ export const SERVICES = [
 ];
 
 export const STATS = [
-  { value: "98%", label: "رضا العملاء" },
-  { value: "3", label: "دول أفريقية" },
-  { value: "+120,000", label: "مستفيد" },
-  { value: "+5,200", label: "عملية ذبح" },
+  { value: 98, suffix: "%", label: "رضا العملاء" },
+  { value: 3, suffix: "", label: "دول أفريقية" },
+  { value: 120000, suffix: "+", label: "مستفيد" },
+  { value: 5200, suffix: "+", label: "عملية ذبح" },
 ];
 
 export const WHY_US = [
