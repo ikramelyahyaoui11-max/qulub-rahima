@@ -34,14 +34,18 @@ export default function Footer() {
           </div>
           <div className="mt-4 flex items-center justify-center gap-3 md:justify-end">
             <a
-              href="#"
+              href={BRAND.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:-translate-y-0.5 hover:bg-brand-gold-500"
               aria-label="فيسبوك"
             >
               <FacebookIcon className="h-4 w-4" />
             </a>
             <a
-              href="#"
+              href={BRAND.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:-translate-y-0.5 hover:bg-brand-gold-500"
               aria-label="إنستغرام"
             >

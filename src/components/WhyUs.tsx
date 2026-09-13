@@ -19,19 +19,23 @@ export default function WhyUs() {
         </h2>
         <div className="mx-auto mt-2 h-1 w-14 rounded-full bg-brand-gold-500" />
 
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-4 gap-2 sm:gap-6">
           {WHY_US.map((item) => {
             const Icon = ICONS[item.icon];
             return (
               <div
                 key={item.title}
-                className="card-elevate flex flex-col items-center gap-3 rounded-2xl px-4 py-6 text-center"
+                className="card-elevate flex flex-col items-center gap-1.5 rounded-2xl px-1 py-3 text-center sm:gap-3 sm:px-4 sm:py-6"
               >
-                <span className="ring-brand-gold-500/20 flex h-14 w-14 items-center justify-center rounded-full bg-brand-gold-500/15 text-brand-gold-600 ring-4">
-                  <Icon className="h-6 w-6" />
+                <span className="ring-brand-gold-500/20 flex h-9 w-9 items-center justify-center rounded-full bg-brand-gold-500/15 text-brand-gold-600 ring-2 sm:h-14 sm:w-14 sm:ring-4">
+                  <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
                 </span>
-                <p className="text-base font-extrabold text-brand-green-900">{item.title}</p>
-                <p className="text-sm leading-6 text-brand-green-900/60">{item.description}</p>
+                <p className="text-[11px] font-extrabold leading-tight text-brand-green-900 sm:text-base">
+                  {item.title}
+                </p>
+                <p className="hidden text-sm leading-6 text-brand-green-900/60 sm:block">
+                  {item.description}
+                </p>
               </div>
             );
           })}

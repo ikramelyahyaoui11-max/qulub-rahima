@@ -4,6 +4,8 @@ export const BRAND = {
   tagline: "مؤسسة القلوب الرحيمة لتنفيذ المشروعات بأفريقيا",
   phone: "201091344637",
   whatsapp: "201091344637",
+  facebook: "https://www.facebook.com/share/1NJm2cWMJp/",
+  instagram: "https://www.instagram.com/alkoloubalrahima",
 };
 
 export const NAV_LINKS = [
@@ -274,7 +276,7 @@ export const WHY_US = [
   {
     icon: "shield",
     title: "مؤسسة موثوقة",
-    description: "مسجلة رسميًا ومعتمدة لتنفيذ المشروعات في أفريقيا",
+    description: "خبرة كبيرة في تنفيذ المشروعات في أفريقيا",
   },
 ];
 
