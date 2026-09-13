@@ -1,7 +1,6 @@
 "use client";
 
 import { MessageCircle, ShoppingBasket } from "lucide-react";
-import { FacebookIcon, InstagramIcon } from "./SocialIcons";
 import { useCart } from "@/lib/cart";
 import { BRAND } from "@/lib/data";
 
@@ -31,20 +30,6 @@ export default function FloatingActions() {
         aria-label="واتساب"
       >
         <MessageCircle className="h-5 w-5" />
-      </a>
-      <a
-        href="#"
-        className="hidden h-11 w-11 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-lg transition-transform hover:scale-105 sm:flex"
-        aria-label="فيسبوك"
-      >
-        <FacebookIcon className="h-5 w-5" />
-      </a>
-      <a
-        href="#"
-        className="hidden h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-lg transition-transform hover:scale-105 sm:flex"
-        aria-label="إنستغرام"
-      >
-        <InstagramIcon className="h-5 w-5" />
       </a>
     </div>
   );
