@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Camera } from "lucide-react";
 import { IMPACT_PHOTOS } from "@/lib/gallery";
+import { useCountUp } from "@/lib/useCountUp";
 
 const INTERVAL_MS = 4000;
+const DOCUMENTED_SLAUGHTERS = 5200;
 
 export default function HeroCarousel() {
   const [index, setIndex] = useState(0);
   const count = IMPACT_PHOTOS.length;
+  const documentedCount = useCountUp(DOCUMENTED_SLAUGHTERS, true);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -74,7 +77,9 @@ export default function HeroCarousel() {
           <Camera className="h-5 w-5" />
         </span>
         <div className="leading-tight">
-          <p className="text-lg font-extrabold text-brand-green-900">5,200+</p>
+          <p className="text-lg font-extrabold text-brand-green-900">
+            {documentedCount.toLocaleString("en-US")}+
+          </p>
           <p className="text-xs text-brand-green-800/70">عملية ذبح موثقة بالصور</p>
         </div>
       </div>

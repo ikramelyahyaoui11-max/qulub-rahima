@@ -3,31 +3,9 @@
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import { Smile, Globe2, Users, CheckCircle2 } from "lucide-react";
 import { STATS } from "@/lib/data";
+import { useCountUp } from "@/lib/useCountUp";
 
 const ICONS: ComponentType<{ className?: string }>[] = [Smile, Globe2, Users, CheckCircle2];
-const DURATION_MS = 1600;
-
-function useCountUp(target: number, start: boolean) {
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    if (!start) return;
-    let frame: number;
-    const startTime = performance.now();
-
-    function tick(now: number) {
-      const progress = Math.min((now - startTime) / DURATION_MS, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(target * eased));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    }
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [start, target]);
-
-  return value;
-}
 
 function StatCard({
   stat,
