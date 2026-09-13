@@ -9,6 +9,7 @@ import {
   saveOtherProjects,
   saveSettings,
   deleteOrder,
+  setOrderContacted,
   generateId,
 } from "@/lib/store";
 import { saveUploadedImage } from "@/lib/uploadImage";
@@ -223,5 +224,13 @@ export async function deleteOrderAction(formData: FormData): Promise<void> {
   await requireAdmin();
   const id = String(formData.get("id") ?? "");
   await deleteOrder(id);
+  revalidatePath("/admin/orders");
+}
+
+export async function setOrderContactedAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const contacted = formData.get("contacted") === "true";
+  await setOrderContacted(id, contacted);
   revalidatePath("/admin/orders");
 }

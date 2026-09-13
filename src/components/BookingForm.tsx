@@ -35,12 +35,14 @@ export default function BookingForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [orderNumber] = useState(() => String(Date.now() % 1000000).padStart(6, "0"));
 
   const canSubmit = items.length > 0 && name.trim().length > 1 && phone.trim().length >= 8;
 
   const handleSubmit = () => {
     if (!canSubmit) return;
     submitOrderAction({
+      orderNumber,
       name: name.trim(),
       phone: phone.trim(),
       whatsappNumber: whatsappNumber.trim() || undefined,
@@ -63,6 +65,7 @@ export default function BookingForm() {
 
   const whatsappHref = useMemo(() => {
     const lines = [
+      `رقم الطلب: #${orderNumber}`,
       `الاسم: ${name.trim()}`,
       `رقم الهاتف: ${phone.trim()}`,
     ];
@@ -71,7 +74,7 @@ export default function BookingForm() {
     items.forEach((item, i) => lines.push(`${i + 1}) ${itemLine(item, format)}`));
     lines.push("", `الإجمالي: ${total.amount} ${total.symbol}`);
     return `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
-  }, [name, phone, whatsappNumber, items, format, total]);
+  }, [orderNumber, name, phone, whatsappNumber, items, format, total]);
 
   if (items.length === 0) {
     return (
@@ -144,6 +147,13 @@ export default function BookingForm() {
             className="rounded-lg border border-black/10 bg-brand-cream-100 px-3 py-2 text-right text-brand-green-900 outline-none transition-colors placeholder:text-brand-green-900/40 focus:border-brand-gold-500 focus:ring-2 focus:ring-brand-gold-500/20"
           />
         </label>
+
+        <div className="flex items-center justify-between rounded-lg bg-brand-gold-500/10 px-3 py-2 text-sm">
+          <span className="font-bold text-brand-green-900">رقم الطلب</span>
+          <span dir="ltr" className="font-extrabold text-brand-gold-600">
+            #{orderNumber}
+          </span>
+        </div>
 
         <div className="flex flex-col gap-1.5 text-sm">
           <span className="font-bold text-brand-green-900">ملخص الطلب</span>

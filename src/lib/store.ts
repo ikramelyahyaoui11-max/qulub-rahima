@@ -24,6 +24,7 @@ export type OrderItem = {
 
 export type Order = {
   id: string;
+  orderNumber: string;
   name: string;
   phone: string;
   whatsappNumber?: string;
@@ -33,6 +34,7 @@ export type Order = {
   currencyCode: string;
   currencySymbol: string;
   createdAt: string;
+  contacted?: boolean;
 };
 
 export type Settings = {
@@ -94,6 +96,14 @@ export async function addOrder(order: Order): Promise<void> {
 export async function deleteOrder(id: string): Promise<void> {
   const orders = await getOrders();
   await writeJSON(ORDERS_FILE, orders.filter((o) => o.id !== id));
+}
+
+export async function setOrderContacted(id: string, contacted: boolean): Promise<void> {
+  const orders = await getOrders();
+  await writeJSON(
+    ORDERS_FILE,
+    orders.map((o) => (o.id === id ? { ...o, contacted } : o))
+  );
 }
 
 /** Generates a short, unique, URL-safe id for a new item (Arabic names can't be reliably slugified). */

@@ -3,6 +3,7 @@
 import { addOrder, generateId, type Order, type OrderItem } from "@/lib/store";
 
 export async function submitOrderAction(input: {
+  orderNumber: string;
   name: string;
   phone: string;
   whatsappNumber?: string;
@@ -14,6 +15,7 @@ export async function submitOrderAction(input: {
 }): Promise<{ id: string }> {
   const order: Order = {
     id: generateId("order"),
+    orderNumber: input.orderNumber,
     name: input.name.trim(),
     phone: input.phone.trim(),
     whatsappNumber: input.whatsappNumber?.trim() || undefined,
