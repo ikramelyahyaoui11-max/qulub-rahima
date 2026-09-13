@@ -66,7 +66,7 @@ export default function Footer() {
         <div className="flex flex-col items-center md:items-end">
           <Logo variant="light" />
           <p className="mt-4 max-w-xs text-sm leading-6 text-white/70">
-            نعمل على تنفيذ الذبائح والأضاحي والمشروعات الخيرية ونوزيعها على الفقراء في أفريقيا
+            نعمل على تنفيذ الذبائح والأضاحي والمشروعات الدينية ونوزيعها على الفقراء في أفريقيا
           </p>
         </div>
       </div>

@@ -6,22 +6,22 @@ export type GalleryPhoto = {
 
 export const IMPACT_PHOTOS: GalleryPhoto[] = [
   {
-    src: "/gallery/impact-1.png",
+    src: "/gallery/impact-1.jpg",
     alt: "توزيع وجبات اللحم على المستفيدين تحت الشجرة",
     caption: "يوم التوزيع",
   },
   {
-    src: "/gallery/impact-2.png",
+    src: "/gallery/impact-2.jpg",
     alt: "تجمع المستفيدين لاستلام وجباتهم",
     caption: "تجهيز التوزيع",
   },
   {
-    src: "/gallery/impact-3.png",
+    src: "/gallery/impact-3.jpg",
     alt: "أطباق الوجبات جاهزة للتوزيع على المستفيدين",
     caption: "الأطباق جاهزة",
   },
   {
-    src: "/gallery/impact-4.png",
+    src: "/gallery/impact-4.jpg",
     alt: "توزيع اللحوم على الأسر المستفيدة",
     caption: "توزيع اللحوم",
   },
@@ -29,12 +29,13 @@ export const IMPACT_PHOTOS: GalleryPhoto[] = [
 
 export type ProofMediaItem =
   | { type: "photo"; src: string; alt: string; caption: string }
-  | { type: "video"; src: string; alt: string; caption: string };
+  | { type: "video"; src: string; poster: string; alt: string; caption: string };
 
 export const PROOF_MEDIA: ProofMediaItem[] = [
   {
     type: "video",
     src: "/gallery/impact-video-1.mp4",
+    poster: "/gallery/impact-video-1-poster.jpg",
     alt: "فيديو توثيقي لعملية التوزيع على المستفيدين",
     caption: "توثيق فيديو 1",
   },
@@ -42,6 +43,7 @@ export const PROOF_MEDIA: ProofMediaItem[] = [
   {
     type: "video",
     src: "/gallery/impact-video-2.mp4",
+    poster: "/gallery/impact-video-2-poster.jpg",
     alt: "فيديو توثيقي لعملية التوزيع على المستفيدين",
     caption: "توثيق فيديو 2",
   },
@@ -54,6 +56,7 @@ export const PROOF_MEDIA: ProofMediaItem[] = [
   {
     type: "video",
     src: "/gallery/impact-video-3.mp4",
+    poster: "/gallery/impact-video-3-poster.jpg",
     alt: "فيديو توثيقي لعملية التوزيع على المستفيدين",
     caption: "توثيق فيديو 3",
   },
@@ -61,6 +64,7 @@ export const PROOF_MEDIA: ProofMediaItem[] = [
   {
     type: "video",
     src: "/gallery/impact-video-4.mp4",
+    poster: "/gallery/impact-video-4-poster.jpg",
     alt: "فيديو توثيقي لعملية التوزيع على المستفيدين",
     caption: "توثيق فيديو 4",
   },
@@ -72,4 +76,3 @@ export const PROOF_MEDIA: ProofMediaItem[] = [
   },
   { type: "photo", ...IMPACT_PHOTOS[3] },
 ];
-

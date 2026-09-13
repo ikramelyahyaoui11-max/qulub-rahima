@@ -5,34 +5,36 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { PROOF_MEDIA, type ProofMediaItem } from "@/lib/gallery";
 
-const AUTOPLAY_MS = 4500;
+const AUTOPLAY_MS = 4000;
 
 function VideoSlide({ item }: { item: Extract<ProofMediaItem, { type: "video" }> }) {
   const [started, setStarted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  useEffect(() => {
+    if (started) videoRef.current?.play().catch(() => {});
+  }, [started]);
+
   return (
     <div className="relative h-full w-full shrink-0 overflow-hidden bg-brand-green-950">
       <video
         ref={videoRef}
-        src={item.src}
+        src={started ? item.src : undefined}
+        poster={item.poster}
         controls={started}
-        preload="metadata"
+        preload="none"
         playsInline
         className="h-full w-full object-cover"
       />
       {!started && (
         <button
           type="button"
-          onClick={() => {
-            setStarted(true);
-            videoRef.current?.play().catch(() => {});
-          }}
+          onClick={() => setStarted(true)}
           className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors hover:bg-black/30"
           aria-label={`تشغيل ${item.caption}`}
         >
-          <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/90 bg-white/15 text-white backdrop-blur-sm transition-transform hover:scale-105">
-            <Play className="h-6 w-6 translate-x-[-2px] fill-white" />
+          <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-white/90 bg-white/15 text-white backdrop-blur-sm transition-transform hover:scale-105">
+            <Play className="h-5 w-5 translate-x-[-2px] fill-white" />
           </span>
         </button>
       )}
@@ -43,7 +45,7 @@ function VideoSlide({ item }: { item: Extract<ProofMediaItem, { type: "video" }>
 function PhotoSlide({ item }: { item: Extract<ProofMediaItem, { type: "photo" }> }) {
   return (
     <div className="relative h-full w-full shrink-0 overflow-hidden bg-brand-green-950">
-      <Image src={item.src} alt={item.alt} fill sizes="(min-width: 1024px) 1200px, 100vw" className="object-cover" />
+      <Image src={item.src} alt={item.alt} fill sizes="(min-width: 1024px) 500px, 80vw" className="object-cover" />
     </div>
   );
 }
@@ -55,17 +57,37 @@ function Slide({ item }: { item: ProofMediaItem }) {
 export default function ProofOfImpact() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [step, setStep] = useState(0);
+  const [visible, setVisible] = useState(1);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const count = PROOF_MEDIA.length;
 
-  const goNext = () => setIndex((i) => (i + 1) % count);
-  const goPrev = () => setIndex((i) => (i - 1 + count) % count);
+  useEffect(() => {
+    function measure() {
+      const viewport = viewportRef.current;
+      const tile = trackRef.current?.firstElementChild as HTMLElement | null;
+      if (!viewport || !tile) return;
+      const gap = parseFloat(getComputedStyle(trackRef.current!).columnGap || "0");
+      const tileStep = tile.getBoundingClientRect().width + gap;
+      setStep(tileStep);
+      setVisible(Math.max(1, Math.round(viewport.clientWidth / tileStep)));
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  const maxIndex = Math.max(0, count - visible);
+  const goNext = () => setIndex((i) => (i >= maxIndex ? 0 : i + 1));
+  const goPrev = () => setIndex((i) => (i <= 0 ? maxIndex : i - 1));
 
   useEffect(() => {
     if (paused) return;
     const id = setInterval(goNext, AUTOPLAY_MS);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paused, count]);
+  }, [paused, maxIndex]);
 
   return (
     <section id="proof" className="bg-brand-green-900 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
@@ -79,16 +101,20 @@ export default function ProofOfImpact() {
         </p>
 
         <div
-          className="relative mt-8 h-64 overflow-hidden rounded-2xl sm:h-80 lg:h-[420px]"
+          ref={viewportRef}
+          className="relative mt-8 h-56 overflow-hidden rounded-2xl sm:h-72 lg:h-80"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
           <div
-            className="flex h-full transition-transform duration-700 ease-out"
-            style={{ transform: `translateX(${index * 100}%)` }}
+            ref={trackRef}
+            className="flex h-full gap-3 transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(${index * step}px)` }}
           >
             {PROOF_MEDIA.map((item, i) => (
-              <Slide key={`${item.src}-${i}`} item={item} />
+              <div key={`${item.src}-${i}`} className="h-full w-[78%] shrink-0 sm:w-[46%] lg:w-[24%]">
+                <Slide item={item} />
+              </div>
             ))}
           </div>
 
@@ -108,20 +134,6 @@ export default function ProofOfImpact() {
           >
             <ChevronRight className="h-6 w-6" />
           </button>
-
-          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
-            {PROOF_MEDIA.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`الشريحة ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-6 bg-white" : "w-1.5 bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </section>
