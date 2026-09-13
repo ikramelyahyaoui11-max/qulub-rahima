@@ -47,69 +47,78 @@ export default async function AdminOrdersPage() {
           <p className="text-sm text-brand-green-900/60">هتظهر هنا أول ما حد يحجز من الموقع</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="flex flex-col gap-3 rounded-2xl border border-black/5 bg-white p-5 text-right shadow-sm"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-extrabold text-brand-green-900">{order.name}</p>
-                  <p className="mt-0.5 text-xs text-brand-green-900/50">{formatDate(order.createdAt)}</p>
-                </div>
-                <form action={deleteOrderAction}>
-                  <input type="hidden" name="id" value={order.id} />
-                  <button
-                    type="submit"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-red-500 hover:bg-red-50"
-                    aria-label="حذف الطلب"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </form>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3 text-sm">
-                <a
-                  href={`tel:${order.phone}`}
-                  className="flex items-center gap-1.5 rounded-full bg-brand-cream-100 px-3 py-1.5 font-semibold text-brand-green-800"
-                  dir="ltr"
-                >
-                  <Phone className="h-3.5 w-3.5" />
-                  {order.phone}
-                </a>
-                {order.whatsappNumber && order.whatsappNumber !== order.phone && (
-                  <a
-                    href={`https://wa.me/${order.whatsappNumber.replace(/[^0-9]/g, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 rounded-full bg-[#25D366]/10 px-3 py-1.5 font-semibold text-[#128C4A]"
-                    dir="ltr"
-                  >
-                    <MessageCircle className="h-3.5 w-3.5" />
-                    {order.whatsappNumber}
-                  </a>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-1.5 rounded-lg bg-brand-cream-100 p-3 text-sm text-brand-green-900/80">
-                {order.items.map((item, i) => (
-                  <p key={i}>{itemLine(item)}</p>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between text-base font-extrabold text-brand-green-900">
-                <span>الإجمالي:</span>
-                <span>
-                  {order.totalDisplay}
-                  <span className="mr-1 text-xs font-medium text-brand-green-900/60">
-                    {order.currencySymbol}
-                  </span>
-                </span>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto rounded-2xl border border-black/5 bg-white shadow-sm">
+          <table className="w-full min-w-[820px] text-right text-sm">
+            <thead>
+              <tr className="border-b border-black/5 bg-brand-cream-100 text-xs font-bold text-brand-green-900/70">
+                <th className="whitespace-nowrap px-4 py-3">التاريخ</th>
+                <th className="px-4 py-3">الاسم</th>
+                <th className="px-4 py-3">التواصل</th>
+                <th className="px-4 py-3">الطلب</th>
+                <th className="whitespace-nowrap px-4 py-3">الإجمالي</th>
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/5">
+              {orders.map((order) => (
+                <tr key={order.id} className="align-top transition-colors hover:bg-brand-cream-100/50">
+                  <td className="whitespace-nowrap px-4 py-4 text-xs text-brand-green-900/60">
+                    {formatDate(order.createdAt)}
+                  </td>
+                  <td className="px-4 py-4 font-bold text-brand-green-900">{order.name}</td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-col items-start gap-1.5">
+                      <a
+                        href={`tel:${order.phone}`}
+                        className="flex items-center gap-1.5 rounded-full bg-brand-cream-100 px-2.5 py-1 text-xs font-semibold text-brand-green-800"
+                        dir="ltr"
+                      >
+                        <Phone className="h-3 w-3" />
+                        {order.phone}
+                      </a>
+                      {order.whatsappNumber && order.whatsappNumber !== order.phone && (
+                        <a
+                          href={`https://wa.me/${order.whatsappNumber.replace(/[^0-9]/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 rounded-full bg-[#25D366]/10 px-2.5 py-1 text-xs font-semibold text-[#128C4A]"
+                          dir="ltr"
+                        >
+                          <MessageCircle className="h-3 w-3" />
+                          {order.whatsappNumber}
+                        </a>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-brand-green-900/80">
+                    <div className="flex flex-col gap-1">
+                      {order.items.map((item, i) => (
+                        <p key={i}>{itemLine(item)}</p>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-4 font-extrabold text-brand-green-900">
+                    {order.totalDisplay}
+                    <span className="mr-1 text-xs font-medium text-brand-green-900/60">
+                      {order.currencySymbol}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    <form action={deleteOrderAction}>
+                      <input type="hidden" name="id" value={order.id} />
+                      <button
+                        type="submit"
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-red-500 hover:bg-red-50"
+                        aria-label="حذف الطلب"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
