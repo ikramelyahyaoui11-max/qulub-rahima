@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Check, Minus, Plus, ShoppingBasket, Star } from "lucide-react";
+import { ArrowRight, Check, Minus, Plus, ShoppingBasket } from "lucide-react";
 import {
   ADDON_OPTIONS,
   DELIVERY_NOTE,
@@ -70,11 +70,6 @@ export default function ProductDetail({ product }: { product: Product }) {
         <div className="order-2 text-right lg:order-1">
           <span className="section-eyebrow">{product.tag}</span>
           <h1 className="mt-3 text-3xl font-extrabold text-brand-green-900">{product.name}</h1>
-          <div className="mt-2 flex justify-end gap-1">
-            {Array.from({ length: product.rating }).map((_, i) => (
-              <Star key={i} className="h-4 w-4 fill-brand-gold-500 text-brand-gold-500" />
-            ))}
-          </div>
           <p className="mt-3 text-brand-green-900/70">{product.description}</p>
           <p className="mt-4 text-2xl font-extrabold text-brand-green-900">
             {price.toLocaleString("en-US")}
