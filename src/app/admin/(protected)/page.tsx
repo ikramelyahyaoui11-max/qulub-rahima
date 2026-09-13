@@ -1,11 +1,21 @@
 import Link from "next/link";
-import { Package, HeartHandshake, Coins, ArrowLeft } from "lucide-react";
-import { getProducts, getOtherProjects } from "@/lib/store";
+import { Package, HeartHandshake, Coins, ClipboardList, ArrowLeft } from "lucide-react";
+import { getProducts, getOtherProjects, getOrders } from "@/lib/store";
 
 export default async function AdminDashboardPage() {
-  const [products, otherProjects] = await Promise.all([getProducts(), getOtherProjects()]);
+  const [products, otherProjects, orders] = await Promise.all([
+    getProducts(),
+    getOtherProjects(),
+    getOrders(),
+  ]);
 
   const cards = [
+    {
+      href: "/admin/orders",
+      icon: ClipboardList,
+      title: "الطلبات",
+      description: `${orders.length} طلب من العملاء`,
+    },
     {
       href: "/admin/products",
       icon: Package,

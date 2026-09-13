@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Package, HeartHandshake, Coins } from "lucide-react";
+import { LogOut, Package, HeartHandshake, Coins, ClipboardList } from "lucide-react";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import { logoutAction } from "../actions";
 
 const NAV = [
+  { href: "/admin/orders", label: "الطلبات", icon: ClipboardList },
   { href: "/admin/products", label: "المنتجات", icon: Package },
   { href: "/admin/other-projects", label: "أبواب القلوب الرحيمة الأخرى", icon: HeartHandshake },
   { href: "/admin/currency", label: "أسعار الصرف", icon: Coins },

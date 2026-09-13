@@ -6,6 +6,7 @@ import { ArrowRight, MessageCircle, ShoppingBasket } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { useCurrency } from "@/lib/currency";
 import { ADDON_OPTIONS, BRAND, INTENTIONS } from "@/lib/data";
+import { submitOrderAction } from "@/app/booking/actions";
 
 function itemLine(
   item: {
@@ -29,13 +30,36 @@ function itemLine(
 
 export default function BookingForm() {
   const { items, totalPrice, updateItem } = useCart();
-  const { format } = useCurrency();
+  const { currency, format } = useCurrency();
   const total = format(totalPrice);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
 
   const canSubmit = items.length > 0 && name.trim().length > 1 && phone.trim().length >= 8;
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    submitOrderAction({
+      name: name.trim(),
+      phone: phone.trim(),
+      whatsappNumber: whatsappNumber.trim() || undefined,
+      items: items.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        addon: item.addon,
+        intention: item.intention,
+        dedicationName: item.dedicationName,
+      })),
+      totalEGP: totalPrice,
+      totalDisplay: total.amount,
+      currencyCode: currency.code,
+      currencySymbol: currency.symbol,
+    }).catch(() => {
+      // best-effort save; don't block handing the customer off to WhatsApp
+    });
+  };
 
   const whatsappHref = useMemo(() => {
     const lines = [
@@ -187,7 +211,11 @@ export default function BookingForm() {
           rel="noopener noreferrer"
           aria-disabled={!canSubmit}
           onClick={(e) => {
-            if (!canSubmit) e.preventDefault();
+            if (!canSubmit) {
+              e.preventDefault();
+              return;
+            }
+            handleSubmit();
           }}
           className={`btn-primary py-3 text-sm ${
             canSubmit ? "" : "cursor-not-allowed opacity-50"

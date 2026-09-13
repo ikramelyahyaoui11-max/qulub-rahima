@@ -8,6 +8,7 @@ import {
   getOtherProjects,
   saveOtherProjects,
   saveSettings,
+  deleteOrder,
   generateId,
 } from "@/lib/store";
 import { saveUploadedImage } from "@/lib/uploadImage";
@@ -214,4 +215,13 @@ export async function saveSettingsAction(
   revalidatePath("/", "layout");
 
   return { success: "تم حفظ أسعار الصرف" };
+}
+
+// ---------- Orders ----------
+
+export async function deleteOrderAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  await deleteOrder(id);
+  revalidatePath("/admin/orders");
 }

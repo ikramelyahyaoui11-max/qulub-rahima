@@ -11,6 +11,29 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
 const OTHER_PROJECTS_FILE = path.join(DATA_DIR, "other-projects.json");
 const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
+const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
+
+export type OrderItem = {
+  name: string;
+  quantity: number;
+  price: number; // in EGP
+  addon?: string;
+  intention?: string;
+  dedicationName?: string;
+};
+
+export type Order = {
+  id: string;
+  name: string;
+  phone: string;
+  whatsappNumber?: string;
+  items: OrderItem[];
+  totalEGP: number;
+  totalDisplay: string;
+  currencyCode: string;
+  currencySymbol: string;
+  createdAt: string;
+};
 
 export type Settings = {
   usdRate: number;
@@ -57,6 +80,20 @@ export async function getSettings(): Promise<Settings> {
 
 export async function saveSettings(settings: Settings): Promise<void> {
   await writeJSON(SETTINGS_FILE, settings);
+}
+
+export async function getOrders(): Promise<Order[]> {
+  return readJSON(ORDERS_FILE, []);
+}
+
+export async function addOrder(order: Order): Promise<void> {
+  const orders = await getOrders();
+  await writeJSON(ORDERS_FILE, [order, ...orders]);
+}
+
+export async function deleteOrder(id: string): Promise<void> {
+  const orders = await getOrders();
+  await writeJSON(ORDERS_FILE, orders.filter((o) => o.id !== id));
 }
 
 /** Generates a short, unique, URL-safe id for a new item (Arabic names can't be reliably slugified). */
