@@ -59,7 +59,8 @@ export default function Header() {
           <CartIcon className="text-brand-green-900" />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <CurrencySelector className="md:hidden" />
           <CartIcon className="text-brand-green-900 md:hidden" />
           <button
             type="button"
@@ -87,7 +88,6 @@ export default function Header() {
             ))}
           </nav>
           <div className="mt-4 flex flex-col gap-3">
-            <CurrencySelector className="self-start" />
             <a
               href={`https://wa.me/${BRAND.whatsapp}`}
               target="_blank"
