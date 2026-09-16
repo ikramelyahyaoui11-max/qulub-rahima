@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, Minus, Plus, ShoppingBasket, Users } from "lucide-react";
+import { Check, Minus, Plus, Search, ShoppingBasket, Users, X } from "lucide-react";
 import { ADDON_OPTIONS, getProductPrice, type CurrencyKey, type Product } from "@/lib/data";
 import { useCart } from "@/lib/cart";
 import { useCurrency } from "@/lib/currency";
@@ -144,7 +144,44 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
+type SortOrder = "default" | "priceAsc" | "priceDesc";
+
+const SORT_LABELS: Record<SortOrder, string> = {
+  default: "الترتيب الافتراضي",
+  priceAsc: "السعر: من الأقل",
+  priceDesc: "السعر: من الأعلى",
+};
+
 export default function Products({ products }: { products: Product[] }) {
+  const { currency } = useCurrency();
+  const [query, setQuery] = useState("");
+  const [intention, setIntention] = useState("الكل");
+  const [sort, setSort] = useState<SortOrder>("default");
+
+  const intentions = useMemo(
+    () => ["الكل", ...Array.from(new Set(products.map((p) => p.defaultIntention)))],
+    [products]
+  );
+
+  const visibleProducts = useMemo(() => {
+    const q = query.trim();
+    let result = products.filter((p) => {
+      const matchesQuery =
+        !q || p.name.includes(q) || p.description.includes(q) || p.tag.includes(q);
+      const matchesIntention = intention === "الكل" || p.defaultIntention === intention;
+      return matchesQuery && matchesIntention;
+    });
+
+    if (sort !== "default") {
+      result = [...result].sort((a, b) => {
+        const priceA = getProductPrice(a, ADDON_OPTIONS[0], currency.code.toLowerCase() as CurrencyKey);
+        const priceB = getProductPrice(b, ADDON_OPTIONS[0], currency.code.toLowerCase() as CurrencyKey);
+        return sort === "priceAsc" ? priceA - priceB : priceB - priceA;
+      });
+    }
+    return result;
+  }, [products, query, intention, sort, currency.code]);
+
   return (
     <section id="products" className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
@@ -155,11 +192,66 @@ export default function Products({ products }: { products: Product[] }) {
           باقات بأسعار جاهزة وواضحة، وكل باقة نشمل التوثيق الكامل بالصور والفيديو
         </p>
 
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        <div className="mx-auto mt-8 flex max-w-3xl flex-col gap-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-green-900/40" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="ابحث عن منتج (خروف، عجل، أضحية...)"
+              className="w-full rounded-full border border-black/10 bg-brand-cream-100 py-2.5 pl-4 pr-10 text-right text-sm text-brand-green-900 outline-none transition-colors placeholder:text-brand-green-900/40 focus:border-brand-gold-500 focus:ring-2 focus:ring-brand-gold-500/20"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label="مسح البحث"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-green-900/40 hover:text-brand-green-900"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {intentions.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => setIntention(opt)}
+                className={`rounded-full border px-4 py-1.5 text-xs font-bold transition-colors sm:text-sm ${
+                  intention === opt
+                    ? "border-brand-gold-500 bg-brand-gold-500 text-white"
+                    : "border-black/10 bg-white text-brand-green-900/70 hover:border-brand-gold-500/40"
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortOrder)}
+              className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-bold text-brand-green-900/70 outline-none transition-colors focus:border-brand-gold-500 sm:text-sm"
+            >
+              {(Object.keys(SORT_LABELS) as SortOrder[]).map((key) => (
+                <option key={key} value={key}>
+                  {SORT_LABELS[key]}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
+        {visibleProducts.length > 0 ? (
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
+            {visibleProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-12 text-brand-green-900/60">لا توجد منتجات مطابقة لبحثك</p>
+        )}
       </div>
     </section>
   );

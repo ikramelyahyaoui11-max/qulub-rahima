@@ -19,6 +19,32 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Lock body scroll while the mobile menu is open, close it on Escape,
+  // and close it automatically if the screen grows past the mobile breakpoint.
+  useEffect(() => {
+    if (!open) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const onBreakpointChange = () => {
+      if (mql.matches) setOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    mql.addEventListener("change", onBreakpointChange);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      mql.removeEventListener("change", onBreakpointChange);
+    };
+  }, [open]);
+
   return (
     <header
       className={`sticky top-0 z-50 border-b bg-brand-cream-100/95 backdrop-blur transition-shadow ${
@@ -74,14 +100,27 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-black/5 bg-brand-cream-100 px-4 py-4 lg:hidden">
-          <nav className="flex flex-col gap-3">
+        <button
+          type="button"
+          aria-label="إغلاق القائمة"
+          onClick={() => setOpen(false)}
+          className="absolute inset-x-0 top-full z-40 h-[100dvh] bg-brand-green-950/30 backdrop-blur-[1px] lg:hidden"
+        />
+      )}
+
+      <div
+        className={`grid overflow-hidden border-t bg-brand-cream-100 transition-[grid-template-rows] duration-300 ease-out lg:hidden ${
+          open ? "grid-rows-[1fr] border-black/5" : "grid-rows-[0fr] border-transparent"
+        }`}
+      >
+        <div className="relative z-40 min-h-0 px-4 py-4">
+          <nav className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={`/${link.href}`}
                 onClick={() => setOpen(false)}
-                className="text-sm font-medium text-brand-green-900/80"
+                className="rounded-lg px-2 py-2.5 text-sm font-medium text-brand-green-900/80 transition-colors active:bg-brand-cream-200"
               >
                 {link.label}
               </Link>
@@ -92,6 +131,7 @@ export default function Header() {
               href={`https://wa.me/${BRAND.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
               className="btn-outline px-4 py-2 text-sm"
             >
               <MessageCircle className="h-4 w-4" />
@@ -106,7 +146,7 @@ export default function Header() {
             </Link>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

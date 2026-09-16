@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, MessageCircle, ShoppingBasket } from "lucide-react";
+import { ArrowRight, Check, Copy, MessageCircle, ShoppingBasket } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { useCurrency } from "@/lib/currency";
 import { ADDON_OPTIONS, BRAND, INTENTIONS } from "@/lib/data";
@@ -29,13 +29,21 @@ function itemLine(
 }
 
 export default function BookingForm() {
-  const { items, totalPrice, updateItem } = useCart();
+  const { items, totalPrice, updateItem, clearCart } = useCart();
   const { currency, format } = useCurrency();
   const total = format(totalPrice);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [confirmed, setConfirmed] = useState<{
+    orderNumber: string | null;
+    name: string;
+    lines: string[];
+    total: string;
+    whatsappUrl: string;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const canSubmit = items.length > 0 && name.trim().length > 1 && phone.trim().length >= 8;
 
@@ -66,7 +74,7 @@ export default function BookingForm() {
       const result = await submitOrderAction(orderInput);
       orderNumber = result.orderNumber;
     } catch {
-      // best-effort save; still hand the customer off to WhatsApp without a number
+      // best-effort save; the customer still gets an on-screen confirmation below
     }
 
     const lines: string[] = [];
@@ -76,13 +84,96 @@ export default function BookingForm() {
     lines.push("", "ملخص الطلب:");
     items.forEach((item, i) => lines.push(`${i + 1}) ${itemLine(item, format)}`));
     lines.push("", `الإجمالي: ${total.amount} ${total.symbol}`);
-    const url = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
+    const whatsappUrl = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
 
-    const win = window.open(url, "_blank", "noopener,noreferrer");
-    if (!win) window.location.href = url;
-
+    // Show the confirmation immediately on-screen — this is automatic and doesn't
+    // depend on WhatsApp opening successfully (popups can be blocked, the app may
+    // not be installed, etc). Sending the WhatsApp message stays an optional,
+    // one-tap step for customers who want to chat with the team directly.
+    setConfirmed({
+      orderNumber,
+      name: name.trim(),
+      lines: items.map((item) => itemLine(item, format)),
+      total: `${total.amount} ${total.symbol}`,
+      whatsappUrl,
+    });
+    clearCart();
     setSubmitting(false);
   };
+
+  const copyOrderNumber = async () => {
+    if (!confirmed?.orderNumber) return;
+    try {
+      await navigator.clipboard.writeText(confirmed.orderNumber);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard unavailable — the number is already visible on screen
+    }
+  };
+
+  if (confirmed) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center gap-5 rounded-2xl border border-black/5 bg-white p-8 text-center shadow-sm">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-green-700/10 text-brand-green-700">
+            <Check className="h-8 w-8" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-extrabold text-brand-green-900">
+              تم استلام طلبك بنجاح
+            </h1>
+            <p className="mt-2 text-brand-green-900/70">
+              شكرًا لك يا {confirmed.name}، سيتواصل معك فريقنا قريبًا لتأكيد التفاصيل
+            </p>
+          </div>
+
+          {confirmed.orderNumber && (
+            <button
+              type="button"
+              onClick={copyOrderNumber}
+              className="flex items-center gap-2 rounded-full bg-brand-cream-100 px-5 py-2 text-sm font-bold text-brand-green-900"
+            >
+              رقم الطلب: <span dir="ltr">{confirmed.orderNumber}</span>
+              {copied ? (
+                <Check className="h-4 w-4 text-brand-green-700" />
+              ) : (
+                <Copy className="h-3.5 w-3.5 text-brand-green-900/50" />
+              )}
+            </button>
+          )}
+
+          <div className="w-full rounded-xl bg-brand-cream-100 p-4 text-right">
+            <p className="mb-2 text-sm font-bold text-brand-green-900">ملخص الطلب</p>
+            <ul className="flex flex-col gap-1.5 text-sm text-brand-green-900/80">
+              {confirmed.lines.map((line, i) => (
+                <li key={i}>{line}</li>
+              ))}
+            </ul>
+            <div className="mt-3 flex items-center justify-between border-t border-black/10 pt-3 text-base font-extrabold text-brand-green-900">
+              <span dir="ltr">{confirmed.total}</span>
+              <span>الإجمالي</span>
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-3 sm:flex-row-reverse">
+            <a
+              href={confirmed.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary flex-1 py-3 text-sm"
+            >
+              <MessageCircle className="h-4 w-4" />
+              تأكيد الطلب عبر واتساب
+            </a>
+            <Link href="/" className="btn-outline flex-1 py-3 text-sm">
+              العودة للرئيسية
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -116,7 +207,7 @@ export default function BookingForm() {
         <h1 className="mt-3 text-3xl font-extrabold text-brand-green-900">إتمام الحجز</h1>
         <div className="mx-auto mt-2 h-1 w-14 rounded-full bg-brand-gold-500" />
         <p className="mx-auto mt-4 max-w-md text-brand-green-900/70">
-          املأ بياناتك وسيتم تحويلك مباشرة إلى واتساب لتأكيد الحجز مع تفاصيل طلبك وسعره
+          املأ بياناتك وسيتم تأكيد طلبك فورًا على الشاشة، ويمكنك إرساله عبر واتساب لمتابعة أسرع
         </p>
       </div>
 
@@ -224,8 +315,8 @@ export default function BookingForm() {
             canSubmit && !submitting ? "" : "cursor-not-allowed opacity-50"
           }`}
         >
-          <MessageCircle className="h-4 w-4" />
-          {submitting ? "جارٍ التجهيز..." : "إرسال الطلب عبر واتساب"}
+          <Check className="h-4 w-4" />
+          {submitting ? "جارٍ التأكيد..." : "تأكيد الطلب"}
         </button>
         {!canSubmit && (
           <p className="-mt-3 text-center text-xs text-brand-green-900/50">

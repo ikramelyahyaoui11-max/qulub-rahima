@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Check, Minus, Plus, ShoppingBasket } from "lucide-react";
@@ -124,6 +124,16 @@ function ProjectCard({ project }: { project: OtherProject }) {
 }
 
 export default function OtherProjects({ projects }: { projects: OtherProject[] }) {
+  const [category, setCategory] = useState("الكل");
+  const categories = useMemo(
+    () => ["الكل", ...Array.from(new Set(projects.map((p) => p.category)))],
+    [projects]
+  );
+  const visibleProjects = useMemo(
+    () => (category === "الكل" ? projects : projects.filter((p) => p.category === category)),
+    [projects, category]
+  );
+
   if (projects.length === 0) return null;
 
   return (
@@ -138,11 +148,34 @@ export default function OtherProjects({ projects }: { projects: OtherProject[] }
           صدقات جارية ومشاريع تنموية نُنفذها مؤسسة القلوب الرحيمة لخدمة الأسر المحتاجة
         </p>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 text-right sm:grid-cols-2 lg:grid-cols-4">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        {categories.length > 2 && (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategory(cat)}
+                className={`rounded-full border px-4 py-1.5 text-xs font-bold transition-colors sm:text-sm ${
+                  category === cat
+                    ? "border-brand-gold-500 bg-brand-gold-500 text-white"
+                    : "border-black/10 bg-white text-brand-green-900/70 hover:border-brand-gold-500/40"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {visibleProjects.length > 0 ? (
+          <div className="mt-10 grid grid-cols-1 gap-6 text-right sm:grid-cols-2 lg:grid-cols-4">
+            {visibleProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-12 text-brand-green-900/60">لا توجد مشاريع في هذا التصنيف حاليًا</p>
+        )}
       </div>
     </section>
   );
