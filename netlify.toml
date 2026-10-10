@@ -1,3 +1,7 @@
 [build]
   command = "npm run build"
   publish = ".next"
+
+[build.environment]
+  # Next.js's build cache can contain env values; it is never published, so don't scan it.
+  SECRETS_SCAN_OMIT_PATHS = ".netlify/.next/cache/**,.next/cache/**"
