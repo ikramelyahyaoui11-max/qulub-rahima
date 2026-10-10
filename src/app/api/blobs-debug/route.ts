@@ -28,6 +28,10 @@ export async function GET() {
   const globalCtx = (globalThis as Record<string, unknown>).netlifyBlobsContext ? "present" : "absent";
 
   const results = [
+    await attempt("fetch example.com", async () => (await fetch("https://example.com", { cache: "no-store" })).status),
+    await attempt("fetch blobs edge (no auth)", async () =>
+      (await fetch("https://edge.netlifyblobs.com/", { cache: "no-store" })).status
+    ),
     await attempt("eventual get", () => getStore("data").get("settings", { type: "json" })),
     await attempt("strong get", () =>
       getStore({ name: "data", consistency: "strong" }).get("settings", { type: "json" })
