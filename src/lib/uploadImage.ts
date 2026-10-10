@@ -1,5 +1,4 @@
-import fs from "fs/promises";
-import path from "path";
+import { putFile } from "./storage";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -8,7 +7,7 @@ const ALLOWED_TYPES: Record<string, string> = {
 };
 const MAX_SIZE = 8 * 1024 * 1024; // 8MB
 
-/** Saves an uploaded image under public/<targetDir>/ and returns its public path, or null if no file was provided. */
+/** Saves an uploaded image to persistent storage and returns its public path (served by app/uploads), or null if no file was provided. */
 export async function saveUploadedImage(
   file: File | null,
   targetDir: string,
@@ -26,10 +25,7 @@ export async function saveUploadedImage(
 
   const safeBase = baseName.replace(/[^a-zA-Z0-9_-]/g, "") || "image";
   const fileName = `${safeBase}-${Date.now()}.${ext}`;
-  const absDir = path.join(process.cwd(), "public", targetDir);
-  await fs.mkdir(absDir, { recursive: true });
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(path.join(absDir, fileName), buffer);
+  await putFile(`${targetDir}/${fileName}`, await file.arrayBuffer(), file.type);
 
-  return `/${targetDir}/${fileName}`;
+  return `/uploads/${targetDir}/${fileName}`;
 }

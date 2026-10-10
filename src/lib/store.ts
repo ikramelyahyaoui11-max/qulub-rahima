@@ -1,18 +1,16 @@
-import fs from "fs/promises";
-import path from "path";
 import {
   PRODUCTS as SEED_PRODUCTS,
   OTHER_PROJECTS as SEED_OTHER_PROJECTS,
   type Product,
   type OtherProject,
 } from "./data";
+import { readJSON, writeJSON, updateJSON } from "./storage";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
-const OTHER_PROJECTS_FILE = path.join(DATA_DIR, "other-projects.json");
-const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
-const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
-const ORDER_COUNTER_FILE = path.join(DATA_DIR, "order-counter.json");
+const PRODUCTS_KEY = "products";
+const OTHER_PROJECTS_KEY = "other-projects";
+const SETTINGS_KEY = "settings";
+const ORDERS_KEY = "orders";
+const ORDER_COUNTER_KEY = "order-counter";
 const STARTING_ORDER_NUMBER = 1800;
 
 export type OrderItem = {
@@ -47,64 +45,44 @@ export type Settings = {
 
 const DEFAULT_SETTINGS: Settings = { usdRate: 49, sarRate: 13.05, eurRate: 53 };
 
-async function readJSON<T>(file: string, seed: T): Promise<T> {
-  try {
-    const raw = await fs.readFile(file, "utf-8");
-    return JSON.parse(raw) as T;
-  } catch {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.writeFile(file, JSON.stringify(seed, null, 2), "utf-8");
-    return seed;
-  }
-}
-
-async function writeJSON<T>(file: string, data: T): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(file, JSON.stringify(data, null, 2), "utf-8");
-}
-
 export async function getProducts(): Promise<Product[]> {
-  return readJSON(PRODUCTS_FILE, SEED_PRODUCTS);
+  return readJSON(PRODUCTS_KEY, SEED_PRODUCTS);
 }
 
 export async function saveProducts(products: Product[]): Promise<void> {
-  await writeJSON(PRODUCTS_FILE, products);
+  await writeJSON(PRODUCTS_KEY, products);
 }
 
 export async function getOtherProjects(): Promise<OtherProject[]> {
-  return readJSON(OTHER_PROJECTS_FILE, SEED_OTHER_PROJECTS);
+  return readJSON(OTHER_PROJECTS_KEY, SEED_OTHER_PROJECTS);
 }
 
 export async function saveOtherProjects(projects: OtherProject[]): Promise<void> {
-  await writeJSON(OTHER_PROJECTS_FILE, projects);
+  await writeJSON(OTHER_PROJECTS_KEY, projects);
 }
 
 export async function getSettings(): Promise<Settings> {
-  return readJSON(SETTINGS_FILE, DEFAULT_SETTINGS);
+  return readJSON(SETTINGS_KEY, DEFAULT_SETTINGS);
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {
-  await writeJSON(SETTINGS_FILE, settings);
+  await writeJSON(SETTINGS_KEY, settings);
 }
 
 export async function getOrders(): Promise<Order[]> {
-  return readJSON(ORDERS_FILE, []);
+  return readJSON(ORDERS_KEY, []);
 }
 
 export async function addOrder(order: Order): Promise<void> {
-  const orders = await getOrders();
-  await writeJSON(ORDERS_FILE, [order, ...orders]);
+  await updateJSON<Order[]>(ORDERS_KEY, [], (orders) => [order, ...orders]);
 }
 
 export async function deleteOrder(id: string): Promise<void> {
-  const orders = await getOrders();
-  await writeJSON(ORDERS_FILE, orders.filter((o) => o.id !== id));
+  await updateJSON<Order[]>(ORDERS_KEY, [], (orders) => orders.filter((o) => o.id !== id));
 }
 
 export async function setOrderContacted(id: string, contacted: boolean): Promise<void> {
-  const orders = await getOrders();
-  await writeJSON(
-    ORDERS_FILE,
+  await updateJSON<Order[]>(ORDERS_KEY, [], (orders) =>
     orders.map((o) => (o.id === id ? { ...o, contacted } : o))
   );
 }
@@ -116,10 +94,10 @@ export function generateId(prefix: string): string {
 
 /** Reserves and returns the next sequential order number (T1800, T1801, ...). */
 export async function reserveNextOrderNumber(): Promise<string> {
-  const counter = await readJSON<{ last: number }>(ORDER_COUNTER_FILE, {
-    last: STARTING_ORDER_NUMBER - 1,
-  });
-  const next = counter.last + 1;
-  await writeJSON(ORDER_COUNTER_FILE, { last: next });
-  return `T${next}`;
+  const counter = await updateJSON<{ last: number }>(
+    ORDER_COUNTER_KEY,
+    { last: STARTING_ORDER_NUMBER - 1 },
+    (current) => ({ last: current.last + 1 })
+  );
+  return `T${counter.last}`;
 }
