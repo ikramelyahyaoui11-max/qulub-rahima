@@ -1,6 +1,7 @@
 "use server";
 
 import { addOrder, generateId, reserveNextOrderNumber, type Order, type OrderItem } from "@/lib/store";
+import { appendOrderToSheet } from "@/lib/googleSheets";
 
 export async function submitOrderAction(input: {
   name: string;
@@ -27,5 +28,13 @@ export async function submitOrderAction(input: {
     createdAt: new Date().toISOString(),
   };
   await addOrder(order);
+
+  try {
+    await appendOrderToSheet(order);
+  } catch {
+    // best-effort: the order is already saved locally either way; a missed
+    // sync can be retried from the "مزامنة الآن" button on /admin/orders
+  }
+
   return { id: order.id, orderNumber };
 }

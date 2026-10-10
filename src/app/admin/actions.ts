@@ -8,12 +8,14 @@ import {
   getOtherProjects,
   saveOtherProjects,
   saveSettings,
+  getOrders,
   deleteOrder,
   setOrderContacted,
   generateId,
 } from "@/lib/store";
 import { saveUploadedImage } from "@/lib/uploadImage";
 import { isAdminAuthenticated, loginAdmin, logoutAdmin } from "@/lib/adminAuth";
+import { syncAllOrdersToSheet } from "@/lib/googleSheets";
 import type { Product, OtherProject, ProductPrice } from "@/lib/data";
 
 export type ActionState = { error?: string; success?: string };
@@ -239,4 +241,21 @@ export async function setOrderContactedAction(formData: FormData): Promise<void>
   const contacted = formData.get("contacted") === "true";
   await setOrderContacted(id, contacted);
   revalidatePath("/admin/orders");
+}
+
+// ---------- Google Sheets sync ----------
+
+/** Re-sends every saved order to the configured Google Sheet (oldest first), for backfilling or recovering from a missed live sync. */
+export async function syncOrdersToSheetsAction(
+  _prevState: ActionState,
+  _formData: FormData
+): Promise<ActionState> {
+  await requireAdmin();
+  try {
+    const orders = await getOrders();
+    const { synced } = await syncAllOrdersToSheet([...orders].reverse());
+    return { success: `تمت مزامنة ${synced} طلب مع Google Sheets` };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "تعذرت المزامنة" };
+  }
 }
